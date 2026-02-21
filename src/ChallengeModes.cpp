@@ -4,6 +4,25 @@
 
 #include "ChallengeModes.h"
 
+void ApplyChallengeVisuals(Player* player)
+{
+    // Define your Spell IDs here / TODO CHANGE THESE LATER
+    uint32 HARDCORE_SPELL = 90000; 
+    uint32 IRONMAN_SPELL  = 46368;
+
+    // Hardcore Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, player)) {
+        if (!player->HasAura(HARDCORE_SPELL))
+            player->AddAura(HARDCORE_SPELL, player);
+    }
+
+    // Iron Man Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_IRON_MAN, player)) {
+        if (!player->HasAura(IRONMAN_SPELL))
+            player->AddAura(IRONMAN_SPELL, player);
+    }
+}
+
 ChallengeModes* ChallengeModes::instance()
 {
     static ChallengeModes instance;
@@ -409,6 +428,8 @@ public:
 
     void OnPlayerLogin(Player* player) override
     {
+        ApplyChallengeVisuals(player);
+
         if (!sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, player) || !sChallengeModes->challengeEnabledForPlayer(HARDCORE_DEAD, player))
         {
             return;
@@ -835,6 +856,7 @@ public:
     {
         player->UpdatePlayerSetting("mod-challenge-modes", action, 1);
         ChatHandler(player->GetSession()).PSendSysMessage("Challenge enabled.");
+        ApplyChallengeVisuals(player);
         CloseGossipMenuFor(player);
         return true;
     }
