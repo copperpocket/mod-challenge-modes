@@ -431,12 +431,19 @@ public:
     {
         ApplyChallengeVisuals(player);
 
-        if (!sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, player) || !sChallengeModes->challengeEnabledForPlayer(HARDCORE_DEAD, player))
+        // If they are Hardcore and dead, ensure they are in ghost form
+        if (sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, player) && 
+            sChallengeModes->challengeEnabledForPlayer(HARDCORE_DEAD, player))
         {
-            return;
+            if (player->IsAlive()) {
+                player->KillPlayer();
+                player->BuildPlayerRepop();
+                player->RepopAtGraveyard();
+            }
+                
+            
+            ChatHandler(player->GetSession()).PSendSysMessage("|cffff0000Your Hardcore journey has ended. You may roam as a ghost, but you cannot return to the living.|r");
         }
-        player->KillPlayer();
-        player->GetSession()->KickPlayer("Hardcore character died");
     }
 
     void OnPlayerReleasedGhost(Player* player) override
@@ -445,8 +452,13 @@ public:
         {
             return;
         }
+
+        // Mark them as permanently dead in the database/settings
         player->UpdatePlayerSetting("mod-challenge-modes", HARDCORE_DEAD, 1);
-        player->GetSession()->KickPlayer("Hardcore character died");
+        
+        // We REMOVE the KickPlayer line. 
+        // The core will now proceed with the standard release-to-graveyard logic.
+        ChatHandler(player->GetSession()).PSendSysMessage("|cffff0000You have released your spirit. You are now a ghost permanently.|r");
     }
 
     void OnPlayerPVPKill(Player* killer, Player* killed) override
@@ -492,12 +504,23 @@ public:
     void OnPlayerResurrect(Player* player, float /*restore_percent*/, bool /*applySickness*/) override
     {
         if (!sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, player))
-        {
             return;
-        }
+
+        // 1. Mark as dead
         player->UpdatePlayerSetting("mod-challenge-modes", HARDCORE_DEAD, 1);
+        
+        // 2. Kill and force ghost state
         player->KillPlayer();
-        player->GetSession()->KickPlayer("Hardcore character died");
+        player->BuildPlayerRepop(); 
+        
+        // 3. Remove the physical corpse from the world
+        // This prevents the "corpse spam" exploit
+        player->RemoveCorpse();
+
+        // 4. Move them to the graveyard so they aren't floating over their "death spot"
+        player->RepopAtGraveyard();
+
+        ChatHandler(player->GetSession()).PSendSysMessage("|cffff0000The light refuses to bring you back. Your Hardcore death is permanent.|r");
     }
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource) override
