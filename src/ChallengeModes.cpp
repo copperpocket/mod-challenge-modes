@@ -3,6 +3,7 @@
  */
 
 #include "ChallengeModes.h"
+#include "WorldSessionMgr.h"
 
 void ApplyChallengeVisuals(Player* player)
 {
@@ -445,25 +446,47 @@ public:
             return;
         }
         player->UpdatePlayerSetting("mod-challenge-modes", HARDCORE_DEAD, 1);
-         player->GetSession()->KickPlayer("Hardcore character died");
+        player->GetSession()->KickPlayer("Hardcore character died");
     }
 
-    void OnPlayerPVPKill(Player* /*killer*/, Player* killed) override
+    void OnPlayerPVPKill(Player* killer, Player* killed) override
     {
         if (!sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, killed))
-        {
             return;
-        }
+
         killed->UpdatePlayerSetting("mod-challenge-modes", HARDCORE_DEAD, 1);
+        
+        std::string zoneName = "an unknown area";
+        if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(killed->GetZoneId()))
+            zoneName = area->area_name[killed->GetSession()->GetSessionDbcLocale()];
+        
+        std::string color = "|cff00ccff"; // One color for all variables
+        std::string msg = "[Hardcore] " + color + std::string(killed->GetName()) + 
+                        "|r has been killed by " + color + std::string(killer->GetName()) + 
+                        "|r in " + color + zoneName + 
+                        "|r at level " + color + std::to_string(killed->GetLevel()) + "|r!";
+        
+        sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, msg);
     }
 
-    void OnPlayerKilledByCreature(Creature* /*killer*/, Player* killed) override
+    void OnPlayerKilledByCreature(Creature* killer, Player* killed) override
     {
         if (!sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, killed))
-        {
             return;
-        }
+
         killed->UpdatePlayerSetting("mod-challenge-modes", HARDCORE_DEAD, 1);
+        
+        std::string zoneName = "an unknown area";
+        if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(killed->GetZoneId()))
+            zoneName = area->area_name[killed->GetSession()->GetSessionDbcLocale()];
+        
+        std::string color = "|cff00ccff"; // One color for all variables
+        std::string msg = "[Hardcore] " + color + std::string(killed->GetName()) + 
+                        "|r has been killed by " + color + std::string(killer->GetName()) + 
+                        "|r in " + color + zoneName + 
+                        "|r at level " + color + std::to_string(killed->GetLevel()) + "|r!";
+        
+        sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, msg);
     }
 
     void OnPlayerResurrect(Player* player, float /*restore_percent*/, bool /*applySickness*/) override
@@ -472,10 +495,9 @@ public:
         {
             return;
         }
-        // A better implementation is to not allow the resurrect but this will need a new hook added first
         player->UpdatePlayerSetting("mod-challenge-modes", HARDCORE_DEAD, 1);
         player->KillPlayer();
-        player->GetSession()->KickPlayer(std::string("Hardcore character died"));
+        player->GetSession()->KickPlayer("Hardcore character died");
     }
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource) override
