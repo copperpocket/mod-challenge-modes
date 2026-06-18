@@ -1,26 +1,39 @@
-# AzerothCore Challenge Modes
-Challenge Modes Module for AzerothCore
+# Mod-Challenge-Modes
 
-This module adds the following challenge modes:
+This module adds a suite of custom challenge modes to the server.
 
-- **Hardcore** - Players who die are permanently ghosts and can never be revived.
-- **Semi-Hardcore** - Players who die lose all worn equipment and carried gold.
-- **Self Crafted** - Players can only wear equipment that they have crafted.
-- **Item Quality Level** - Players can only wear equipment that is of Normal or Poor quality
-- **Slow XP Gain** - Players receive 0.5x the normal amount of XP.
-- **Very Slow XP Gain** - Players receive 0.25x the normal amount of XP.
-- **Quest XP Only** - Players can receive XP only from quests
-- **Iron Man Mode** - Enforces the [Iron Man Ruleset](https://wowchallenges.com/challangeinfo/iron-man/)
+## Contents
+* **Server Logic:** Complete module source code for handling challenge mode triggers and logic.
+* **Visuals & DBCs:** Custom icons and database entries for challenge mode selection.
 
-Challenges can be activated per-character by interacting with the Shrine of Challenge added near the graveyard of each starting area.
-Challenges can only be enabled on characters at level 1 (or level 55 for Death Knights).
+## How to Play
+Challenges can be activated per-character by interacting with the **Shrine of Challenge** located near the graveyard of each starting area.
 
-Multiple challenges can be activated on a single character as long as they do not conflict, such as Hardcore and Semi-Hardcore.
+* **Requirements:** Challenges can only be enabled on characters at level 1 (or level 55 for Death Knights).
+* **Stacking:** Multiple challenges can be activated on a single character as long as they do not conflict (e.g., Hardcore and Semi-Hardcore).
+* **Configuration:** Please ensure `EnablePlayerSettings` is set to `1` in your `worldserver.conf` file, as this module uses Player Settings to store enabled challenges.
 
-Rewards for reaching level thresholds for each challenge can be added using the Config file, and can include:
-- Items
-- Titles
-- Talent Points
-- Increased XP Rate
+### Available Modes (Config Order)
+1. **Hardcore:** Players who die are permanently ghosts and can never be revived.
+2. **Semi-Hardcore:** Players who die lose all worn equipment and carried gold.
+3. **Self Crafted:** Players can only wear equipment that they have crafted.
+4. **Item Quality Level:** Players can only wear equipment that is of Normal or Poor quality.
+5. **Slow XP Gain:** XP rates reduced to 0.5x.
+6. **Very Slow XP Gain:** XP rates reduced to 0.25x.
+7. **Quest XP Only:** XP can only be earned from quests.
+8. **Iron Man Mode:** Enforces the full Iron Man ruleset.
 
-Please note that this module uses Player Settings to store enabled challenges, so please ensure EnablePlayerSettings is set to 1 in your worldserver.conf.
+## Required Assets
+To see the custom icons and visuals, you **must** download the `patch-V.mpq` file from the **Releases** tab of this repository and place it in your WoW client's `Data` folder.
+
+## How to Install
+
+### 1. Add the Module to your Server
+Open your terminal or command prompt, navigate to your AzerothCore directory, and clone this module into the `modules` folder:
+
+```bash
+# Navigate to your AzerothCore modules directory
+cd ~/azerothcore-wotlk/modules/
+
+# Clone this repository
+git clone https://github.com/copperpocket/mod-challenge-modes.git
