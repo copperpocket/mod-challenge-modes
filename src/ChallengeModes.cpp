@@ -8,19 +8,61 @@
 void ApplyChallengeVisuals(Player* player)
 {
     // Define your Spell IDs here / TODO CHANGE THESE LATER
-    uint32 HARDCORE_SPELL = 90000; 
-    uint32 IRONMAN_SPELL  = 46368;
-
+    uint32 HARDCORE_SPELL       = 200000; 
+    uint32 SEMI_HARDCORE_SPELL  = 200001;
+    uint32 IRONMAN_SPELL        = 200002;
+    uint32 SLOW_XP_SPELL        = 200003;
+    uint32 VERY_SLOW_XP_SPELL   = 200004;
+    uint32 QUEST_XP_ONLY_SPELL  = 200005;
+    uint32 SELF_CRAFTED_SPELL   = 200006;
+    uint32 LOW_QUALITY_SPELL    = 200007;
+    
     // Hardcore Buff
     if (sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, player)) {
         if (!player->HasAura(HARDCORE_SPELL))
             player->AddAura(HARDCORE_SPELL, player);
     }
 
+    // Semi-Hardcore Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_SEMI_HARDCORE, player)) {
+        if (!player->HasAura(SEMI_HARDCORE_SPELL))
+            player->AddAura(SEMI_HARDCORE_SPELL, player);
+    }
+
     // Iron Man Buff
     if (sChallengeModes->challengeEnabledForPlayer(SETTING_IRON_MAN, player)) {
         if (!player->HasAura(IRONMAN_SPELL))
             player->AddAura(IRONMAN_SPELL, player);
+    }
+
+    // Slow XP Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_SLOW_XP_GAIN, player)) {
+        if (!player->HasAura(SLOW_XP_SPELL))
+            player->AddAura(SLOW_XP_SPELL, player);
+    }
+
+    // Very Slow XP Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_VERY_SLOW_XP_GAIN, player)) {
+        if (!player->HasAura(VERY_SLOW_XP_SPELL))
+            player->AddAura(VERY_SLOW_XP_SPELL, player);
+    }
+
+    // Quest XP Only Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_QUEST_XP_ONLY, player)) {
+        if (!player->HasAura(QUEST_XP_ONLY_SPELL))
+            player->AddAura(QUEST_XP_ONLY_SPELL, player);
+    }
+
+    // Self-Crafted Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_SELF_CRAFTED, player)) {
+        if (!player->HasAura(SELF_CRAFTED_SPELL))
+            player->AddAura(SELF_CRAFTED_SPELL, player);
+    }
+
+    // Low Quality Item Buff
+    if (sChallengeModes->challengeEnabledForPlayer(SETTING_ITEM_QUALITY_LEVEL, player)) {
+        if (!player->HasAura(LOW_QUALITY_SPELL))
+            player->AddAura(LOW_QUALITY_SPELL, player);
     }
 }
 
@@ -501,7 +543,7 @@ public:
         sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, msg);
     }
 
-    void OnPlayerResurrect(Player* player, float /*restore_percent*/, bool /*applySickness*/) override
+    void OnPlayerResurrect(Player* player, float /*restore_percent*/, bool& /*applySickness*/) override
     {
         if (!sChallengeModes->challengeEnabledForPlayer(SETTING_HARDCORE, player))
             return;
@@ -692,7 +734,12 @@ class ChallengeMode_IronMan : public ChallengeMode
 public:
     ChallengeMode_IronMan() : ChallengeMode("ChallengeMode_IronMan", SETTING_IRON_MAN) {}
 
-    void OnPlayerResurrect(Player* player, float /*restore_percent*/, bool /*applySickness*/) override
+    void OnPlayerLogin(Player* player) override
+    {
+        ApplyChallengeVisuals(player);
+    }
+
+    void OnPlayerResurrect(Player* player, float /*restore_percent*/, bool& /*applySickness*/) override
     {
         if (!sChallengeModes->challengeEnabledForPlayer(SETTING_IRON_MAN, player))
         {
