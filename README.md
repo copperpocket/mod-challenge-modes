@@ -1,4 +1,4 @@
-# Mod-Challenge-Modes
+# Mod-Challenge-Modes v0.1.0
 
 This module adds a suite of custom challenge modes to the server.
 
@@ -36,4 +36,4 @@ Open your terminal or command prompt, navigate to your AzerothCore directory, an
 cd ~/azerothcore-wotlk/modules/
 
 # Clone this repository
-git clone https://github.com/copperpocket/mod-challenge-modes.git
+git clone [https://github.com/copperpocket/mod-challenge-modes.git](https://github.com/copperpocket/mod-challenge-modes.git)
