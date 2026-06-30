@@ -4,6 +4,7 @@
 
 #include "ChallengeModes.h"
 #include "WorldSessionMgr.h"
+#include "DBCStores.h"
 
 void ApplyChallengeVisuals(Player* player)
 {
@@ -453,6 +454,14 @@ void OnPlayerLevelChanged(Player* player, uint8 /*oldlevel*/) override
         uint32 itemEntry = itemRewardMap->at(level);
         uint32 itemAmount = sChallengeModes->getItemRewardAmount(settingName); // Fetch item amount from config
         player->SendItemRetrievalMail({ { itemEntry, itemAmount } });
+    }
+
+    if (settingName == SETTING_HARDCORE && level == 60)
+    {
+        if (AchievementEntry const* achievement = sAchievementStore.LookupEntry(60000))
+        {
+            player->CompletedAchievement(achievement);
+        }
     }
 
     if (sChallengeModes->getDisableLevel(settingName) && sChallengeModes->getDisableLevel(settingName) <= level)
