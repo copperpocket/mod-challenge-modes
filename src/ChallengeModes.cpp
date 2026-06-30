@@ -425,6 +425,7 @@ void OnPlayerLevelChanged(Player* player, uint8 /*oldlevel*/) override
         ChatHandler handler(player->GetSession());
         std::string tNameLink = handler.GetNameLink(player);
         std::string titleNameStr = Acore::StringFormat(player->getGender() == GENDER_MALE ? titleInfo->nameMale[handler.GetSessionDbcLocale()] : titleInfo->nameFemale[handler.GetSessionDbcLocale()], player->GetName());
+        // Apply the title to the character on the server side
         player->SetTitle(titleInfo);
     }
 
